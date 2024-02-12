@@ -3,6 +3,7 @@ use std::env;
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
+use clap::Parser;
 
 const RGB_DIVISOR: f32 = 255.0; 
 
@@ -26,13 +27,13 @@ fn main() {
     //let dst: Vec<&[i32]> = data.chunks(8).collect();
     //file_reader(&args[1]);
     // file_writer(&args[2]);
-    let mut rgba = Rgba {
+    let rgba = Rgba {
         r: 133,
         g: 205,
         b: 33,
         a: 255,
     };
-    dbg!(calculate_hue_from_rgb(&rgba));
+    dbg!(calculate_hsl_from_rgb(&rgba));
 }
 
 fn file_reader(filepath: &String) {
@@ -67,7 +68,7 @@ fn file_writer(filepath: &String) {
     writer.write_image_data(&data).unwrap();
 }
 
-fn calculate_hue_from_rgb(rgba: &Rgba) -> Hsl {
+fn calculate_hsl_from_rgb(rgba: &Rgba) -> Hsl {
     let converted_r = rgba.r as f32 / RGB_DIVISOR;
     let converted_g = rgba.g as f32 / RGB_DIVISOR;
     let converted_b = rgba.b as f32 / RGB_DIVISOR;
@@ -104,13 +105,30 @@ fn calculate_hue_from_rgb(rgba: &Rgba) -> Hsl {
         hue += 360.0;
     }
 
-    let lightness = (max + min) / 2.0;
+    let mut lightness = (max + min) / 2.0;
+    let mut saturation = difference / ((1.0 - (2.0 * lightness - 1.0).abs()));
+    
+    saturation *= 100.0;
+    lightness *= 100.0;
 
-
-    println!("HUE waduwad");
     Hsl{
         hue: hue,
-        saturation: 0.0,
-        lightness: 0.0,
+        saturation: saturation,
+        lightness: lightness,
+    }
+}
+
+
+fn calculate_rgb_from_hsl(hsl: &Hsl) -> Rgba {
+     
+
+
+
+
+    Rgba {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 0,
     }
 }
