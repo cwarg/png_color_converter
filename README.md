@@ -10,10 +10,14 @@ Sapphire.png was made manually and ruby, emerald, and amethyst were created with
 ![](./resources/sapphire.png) -> ![](./resources/amethyst.png)
 
 ## Installation
-- To be added
+```shell
+cargo install png_color_converter
+```
 
 ## Usage
-- To be added
+```shell
+png_color_converter --input-file <Path to input png to convert.> --output-file <Output path (including file name) where you'd like the converted file to be saved.> --color <Choose one of the following: red, orange, yellow, green, blue, indigo, violet...>
+```
 
 ## Acknowledgements
 - See [resources.txt](./resources/resources.txt) for articles that I used for different formulas and examples.
