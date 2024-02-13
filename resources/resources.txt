@@ -4,6 +4,9 @@ https://stackoverflow.com/questions/39118528/rgb-to-hsl-conversion
 More Formulas
 https://www.baeldung.com/cs/convert-color-hsl-rgb
 
+Default Hue Values Pulled from
+https://www.w3schools.com/html/html_colors_hsl.asp
+
 RGB to HSL Converter
 https://www.rapidtables.com/convert/color/rgb-to-hsl.html
 
