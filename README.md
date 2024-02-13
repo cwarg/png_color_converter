@@ -4,6 +4,7 @@ Translates the colors of a given 16x16 png to a different hue, while retaining t
 
 ## Examples
 Sapphire.png was made manually and ruby, emerald, and amethyst were created with this program. These show up quite small, but if you were to open them up in IntelliJ, GIMP, or some other program you can see that the 16x16 texture maintained it's quality.
+
 ![](./resources/sapphire.png) -> ![](./resources/ruby.png)\
 ![](./resources/sapphire.png) -> ![](./resources/emerald.png)\
 ![](./resources/sapphire.png) -> ![](./resources/amethyst.png)
