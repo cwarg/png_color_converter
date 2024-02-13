@@ -16,4 +16,4 @@ Sapphire.png was made manually and ruby, emerald, and amethyst were created with
 - To be added
 
 ## Acknowledgements
-- See [./resources/resources.txt] for articles that I used for different formulas and examples.
+- See ![](./resources/resources.txt) for articles that I used for different formulas and examples.
