@@ -1,6 +1,9 @@
 RGB to HSL Conversion Formulas SO
 https://stackoverflow.com/questions/39118528/rgb-to-hsl-conversion
 
+More Formulas
+https://www.baeldung.com/cs/convert-color-hsl-rgb
+
 RGB to HSL Converter
 https://www.rapidtables.com/convert/color/rgb-to-hsl.html
 
@@ -9,6 +12,3 @@ https://www.rapidtables.com/convert/color/hsl-to-rgb.html
 
 JS Converting Color Spaces
 https://css-tricks.com/converting-color-spaces-in-javascript/
-
-Vector Split:
-https://stackoverflow.com/questions/67008105/how-can-i-split-a-vector-into-smaller-vectors-of-size-n

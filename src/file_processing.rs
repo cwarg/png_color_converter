@@ -1,36 +1,86 @@
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
-use png::Reader;
+use crate::color_processing::{calculate_hsl_from_rgb, calculate_rgb_from_hsl, Hsl, Rgba};
 
-fn file_reader(filepath: &String) {
-    let decoder = png::Decoder::new(File::open(filepath).unwrap());
+const RED:f32 = 360.0;
+const ORANGE:f32 = 39.0;
+const YELLOW:f32 = 55.0;
+const GREEN:f32 = 147.0;
+const BLUE:f32 = 240.0;
+const INDIGO:f32 = 300.0;
+const VIOLET:f32 = 248.0;
+
+pub fn process_image(input_filepath: &String, output_filepath: &String, color: &str, hue_value: &Option<f32>) {
+    let decoder = png::Decoder::new(File::open(input_filepath).unwrap());
     let mut reader = decoder.read_info().unwrap();
     let mut buf = vec![0; reader.output_buffer_size()];
     let info = reader.next_frame(&mut buf).unwrap();
-    let bytes = &buf[..info.buffer_size()];
-    let in_animation = reader.info().frame_control().is_some();
-    dbg!(bytes);
+    let bytes: &[u8] = &buf[..info.buffer_size()];
+
+    let color = match color.to_lowercase().trim() {
+        "red" => RED,
+        "orange" => ORANGE,
+        "yellow" => YELLOW,
+        "green" => GREEN,
+        "blue" => BLUE,
+        "indigo" => INDIGO,
+        "violet" => VIOLET,
+        _ => panic!("Unhandled Color Has Been Entered")
+    };
+    let bytes = process_pixels(bytes, color);
+    file_writer(output_filepath, bytes);
 }
 
-fn file_writer(filepath: &String) {
+pub fn file_writer(filepath: &String, bytes: Vec<u8>) {
     let path = Path::new(filepath);
     let file = File::create(path).unwrap();
     let ref mut w = BufWriter::new(file);
-
     let mut encoder = png::Encoder::new(w, 16, 16);
     encoder.set_color(png::ColorType::Rgba);
     encoder.set_depth(png::BitDepth::Eight);
-
     let mut writer = encoder.write_header().unwrap();
-    //let mut data: [u8; 1024] = [0,0,0,0,0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    6,    33,    55,    255,    28,    59,    82,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    6,    33,    55,    255,    122,    200,    255,    255,    168,    233,    255,    255,    28,    59,    82,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1,    19,    33,    255,    122,    200,    255,    255,    51,    161,    240,    255,    122,    200,    255,    255,    168,    233,    255,    255,    28,    59,    82,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    6,    33,    55,    255,    51,    161,    240,    255,    51,    161,    240,    255,    18,    68,    106,    255,    56,    116,    160,    255,    122,    200,    255,    255,    122,    200,    255,    255,    28,    59,    82,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    6,    33,    55,    255,    122,    200,    255,    255,    51,    161,    240,    255,    18,    68,    106,    255,    51,    161,    240,    255,    168,    233,    255,    255,    56,    116,    160,    255,    122,    200,    255,    255,    168,    233,    255,    255,    28,    59,    82,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    6,    33,    55,    255,    51,    161,    240,    255,    18,    68,    106,    255,    51,    161,    240,    255,    122,    200,    255,    255,    122,    200,    255,    255,    168,    233,    255,    255,    18,    68,    106,    255,    51,    161,    240,    255,    6,    33,    55,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1,    19,    33,    255,    51,    161,    240,    255,    18,    68,    106,    255,    122,    200,    255,    255,    122,    200,    255,    255,    122,    200,    255,    255,    51,    161,    240,    255,    18,    68,    106,    255,    51,    161,    240,    255,    28,    59,    82,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    6,    33,    55,    255,    51,    161,    240,    255,    56,    116,    160,    255,    122,    200,    255,    255,    122,    200,    255,    255,    51,    161,    240,    255,    51,    161,    240,    255,    18,    68,    106,    255,    122,    200,    255,    255,    6,    33,    55,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1,    19,    33,    255,    122,    200,    255,    255,    56,    116,    160,    255,    122,    200,    255,    255,    51,    161,    240,    255,    51,    161,    240,    255,    51,    161,    240,    255,    56,    116,    160,    255,    51,    161,    240,    255,    6,    33,    55,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    28,    59,    82,    255,    122,    200,    255,    255,    56,    116,    160,    255,    51,    161,    240,    255,    51,    161,    240,    255,    51,    161,    240,    255,    122,    200,    255,    255,    18,    68,    106,    255,    51,    161,    240,    255,    1,    19,    33,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    28,    59,    82,    255,    17,    88,    219,    255,    17,    88,    219,    255,    18,    68,    106,    255,    51,    161,    240,    255,    122,    200,    255,    255,    18,    68,    106,    255,    51,    161,    240,    255,    122,    200,    255,    255,    6,    33,    55,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1,    19,    33,    255,    51,    161,    240,    255,    17,    88,    219,    255,    56,    116,    160,    255,    18,    68,    106,    255,    51,    161,    240,    255,    122,    200,    255,    255,    6,    33,    55,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1,    19,    33,    255,    51,    161,    240,    255,    17,    88,    219,    255,    51,    161,    240,    255,    51,    161,    240,    255,    1,    19,    33,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1,    19,    33,    255,    17,    88,    219,    255,    51,    161,    240,    255,    6,    33,    55,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1,    19,    33,    255,    1,    19,    33,    255,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,];
-    let mut data: [u8; 1024] = [0; 1024];
-    let init = [255, 255, 255, 255, 255, 255, 255, 255];
-    data[..init.len()].copy_from_slice(&init);
-    //    for i in 0..data.len() {
-    //       if data[i] != 0 {
-    //            data[i] = data[i].wrapping_add(5);
-    //        }
-    //    }
-    writer.write_image_data(&data).unwrap();
+    writer.write_image_data(&bytes).unwrap();
+}
+
+pub fn process_pixels(bytes: &[u8], color: f32) -> Vec<u8> {
+    let dst: Vec<&[u8]> = bytes.chunks(4).collect();
+    let mut rgba_vec: Vec<Rgba> = vec![];
+    for pixel in dst {
+        rgba_vec.push(Rgba{r: pixel[0], g: pixel[1], b: pixel[2], a: pixel[3]});
+    }
+    let mut hsl_vec: Vec<Hsl> = vec![];
+    for pixel in rgba_vec {
+        if !(pixel.r == 0 && pixel.g == 0 && pixel.g == 0) {
+            let current_pixel_as_hsl = calculate_hsl_from_rgb(pixel);
+            hsl_vec.push(Hsl {
+                hue: current_pixel_as_hsl.hue,
+                saturation:current_pixel_as_hsl.saturation,
+                lightness: current_pixel_as_hsl.lightness,
+            })
+        } else {
+            hsl_vec.push(Hsl {hue: 0.0, saturation: 0.0, lightness: 0.0})
+        }
+    }
+    rgba_vec = Vec::new();
+    for hsl_pixel in &mut hsl_vec {
+        if !(hsl_pixel.hue == 0.0) {
+            hsl_pixel.hue = color;
+        }
+        let final_rgba_pixel = calculate_rgb_from_hsl(
+            Hsl {
+                hue: hsl_pixel.hue,
+                saturation: hsl_pixel.saturation,
+                lightness: hsl_pixel.lightness,
+            });
+        rgba_vec.push(final_rgba_pixel);
+    }
+    let mut final_array: Vec<u8> = vec![];
+    for pixel in rgba_vec {
+        final_array.push(pixel.r);
+        final_array.push(pixel.g);
+        final_array.push(pixel.b);
+        final_array.push(pixel.a);
+    }
+    final_array
 }
