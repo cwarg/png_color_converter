@@ -1,5 +1,7 @@
 [package]
 name = "png_color_converter"
+description = """Used for converting the hue of a given 16x16 png while retaining saturation and lightness.
+Useful for converting minecraft textures to another color while retaining the shading / details."""
 version = "0.1.0"
 edition = "2021"
 authors = ["Cade Warg"]
