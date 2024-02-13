@@ -3,8 +3,13 @@ name = "png_color_converter"
 version = "0.1.0"
 edition = "2021"
 authors = ["Cade Warg"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/cwarg/png_color_converter"
+categories = ["command-line-utilities"]
+keywords = ["images"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+    # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 clap = { version = "4.5.0", features = ["derive"] }
