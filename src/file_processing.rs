@@ -11,7 +11,7 @@ const BLUE:f32 = 240.0;
 const INDIGO:f32 = 300.0;
 const VIOLET:f32 = 248.0;
 
-pub fn process_image(input_filepath: &String, output_filepath: &String, color: &str, hue_value: &Option<f32>) {
+pub fn process_image(input_filepath: &String, output_filepath: &String, color: &String) {
     let decoder = png::Decoder::new(File::open(input_filepath).unwrap());
     let mut reader = decoder.read_info().unwrap();
     let mut buf = vec![0; reader.output_buffer_size()];
@@ -30,6 +30,7 @@ pub fn process_image(input_filepath: &String, output_filepath: &String, color: &
     };
     let bytes = process_pixels(bytes, color);
     file_writer(output_filepath, bytes);
+
 }
 
 pub fn file_writer(filepath: &String, bytes: Vec<u8>) {

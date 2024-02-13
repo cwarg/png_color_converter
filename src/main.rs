@@ -16,11 +16,11 @@ struct Args {
     #[arg(short, long, value_name = "Choose one of the following: red, orange, yellow, green, blue, indigo, violet...")]
     color: String,
 
-    #[arg(short, long, value_name = "Optionally pick a specific hue value (f32 between 0.0 and 360.0) rather than using one of the preset ones.")]
-    value: Option<f32>,
+    // #[arg(short, long, value_name = "Optionally pick a specific hue value (f32 between 0.0 and 360.0) rather than using one of the preset ones.")]
+    // value: Option<f32>,
 }
 
 fn main() {
     let args = Args::parse();
-    process_image(&args.input_file, &args.output_file, &args.color, &args.value);
+    process_image(&args.input_file, &args.output_file, &args.color);
 }
